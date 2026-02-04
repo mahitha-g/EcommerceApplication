@@ -1,8 +1,17 @@
+import './Cart.css'
 const Cart = ({ cart, setCart }) => {
 
+  // REMOVE ITEM FROM CART
+  const handleRemoveItem = (indexToRemove) => {
+    const updatedCart = cart.filter((_, index) => index !== indexToRemove);
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
   const handlePlaceOrder = () => {
-    const existingOrders =
-      JSON.parse(localStorage.getItem("orders")) || [];
+    if (cart.length === 0) return;
+
+    const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
 
     const newOrder = {
       id: Date.now(),
@@ -23,19 +32,36 @@ const Cart = ({ cart, setCart }) => {
   };
 
   return (
-    <div>
+    <div className="cart">
       <h2>Cart</h2>
 
       {cart.length === 0 && <p>Cart is empty</p>}
 
-      {cart.map((item, index) => (
-        <p key={index}>
-          {item.title} - ₹{item.price}
-        </p>
-      ))}
+      <div className="cart-items">
+        {cart.map((item, index) => (
+          <div className="cart-item" key={index}>
+            <img
+              src={item.image}
+              alt={item.title}
+              className="cart-item-image"
+            />
+            <div className="cart-item-details">
+              <h3>{item.title}</h3>
+              <p>₹ {item.price}</p>
+              <p className="description">{item.description}</p>
+              <button
+                className="remove-btn"
+                onClick={() => handleRemoveItem(index)}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {cart.length > 0 && (
-        <button onClick={handlePlaceOrder}>
+        <button className="place-order-btn" onClick={handlePlaceOrder}>
           Place Order
         </button>
       )}
@@ -44,3 +70,4 @@ const Cart = ({ cart, setCart }) => {
 };
 
 export default Cart;
+
