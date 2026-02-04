@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import "./VendorDashboard.css";
 
 const VendorDashboard = ({ products, setProducts, orders }) => {
@@ -9,6 +9,14 @@ const VendorDashboard = ({ products, setProducts, orders }) => {
     image: "",
     description: ""
   };
+
+  const [localOrders, setLocalOrders] = useState([]);
+
+useEffect(() => {
+  const storedOrders =
+    JSON.parse(localStorage.getItem("orders")) || [];
+  setLocalOrders(storedOrders);
+}, []);
 
   const [formData, setFormData] = useState(emptyProduct);
   const [editId, setEditId] = useState(null);
@@ -138,27 +146,28 @@ const VendorDashboard = ({ products, setProducts, orders }) => {
 
       {/* SALES HISTORY */}
       <h3 className="sales-title">Sales History</h3>
+{localOrders.length === 0 && <p>No purchases yet</p>}
 
-      {orders.length === 0 && <p>No purchases yet</p>}
+{localOrders.map(order => (
+  <div className="order-card" key={order.id}>
+    <p><strong>Order ID:</strong> {order.id}</p>
+    <p><strong>Time:</strong> {order.timestamp}</p>
 
-      {orders.map((order) => (
-        <div className="order-card" key={order.id}>
-          <p><strong>Order ID:</strong> {order.id}</p>
-          <p><strong>Time:</strong> {order.timestamp}</p>
-
-          {order.items.map((item, i) => (
-            <div className="sold-product" key={i}>
-              <img src={item.image} alt={item.title} />
-              <div>
-                <p>{item.title}</p>
-                <p>₹ {item.price}</p>
-              </div>
-            </div>
-          ))}
+    {order.items.map((item, i) => (
+      <div className="sold-product" key={i}>
+        <img src={item.image} alt={item.title} />
+        <div>
+          <p>{item.title}</p>
+          <p>₹ {item.price}</p>
         </div>
-      ))}
+      </div>
+    ))}
+  </div>
+))}
+
     </div>
   );
 };
 
 export default VendorDashboard;
+
